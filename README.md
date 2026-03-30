@@ -2,129 +2,8 @@
 
 **Global LTE Band Optimizer for Gaming**
 
-ZTE tabanli LTE modemlerde oyun icin en iyi bandi otomatik bulan ve kilitleyen arac.
 A tool that automatically finds and locks the best LTE band for gaming on ZTE-based modems.
-
----
-
-## TR - Turkce
-
-### Ne Yapar?
-
-Internet Avcisi, ZTE tabanli LTE modeminizin tum bantlarini tek tek test eder, her bant icin birden fazla oyun sunucusuna ping atar ve en dusuk gecikme / en az kayip saglayan bandi otomatik olarak kilitler.
-
-### Ozellikler
-
-- **21 LTE bant destegi** (B1-B43, FDD + TDD) - bolgeye gore filtrelenir
-- **8 bolge** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
-- **Oyuncu odakli skorlama** - Ping (%40) + Jitter (%35) + Paket Kaybi (%25)
-- **Medyan ping hesabi** - Tek bir spike tum bandi cokmez, gercek deneyiminizi olcer
-- **PDV Jitter** - Ardisik ping farklarinin ortalamasi (RFC 3550 uyumlu)
-- **Isinma pingi** - Bant gecisi sonrasi PDP context icin warm-up
-- **Stabilite bonusu** - Mevcut bant yeterince iyiyse gereksiz gecis yapmaz
-- **Minimum sunucu esigi** - 5 sunucudan 2'sine ulasamayan bant direkt elenir
-- **Watch modu** - Surekli izler, bozulursa otomatik yeniden optimize eder
-- **ZTE Goform API** - Modem paneline HTTP ile baglanir, bant kilidini degistirir
-- **Turkce & Ingilizce** - Tam iki dilli arayuz
-- **Sifre guvenligi** - Sifre diske kaydedilmez, her calistirmada sorulur
-
-### Gereksinimler
-
-- Windows 10/11
-- Windows PowerShell 5.1+ (yerlesik, ekstra kurulum gerekmez)
-- ZTE tabanli LTE modem (MF286R, MF283V, MC801A, MF279, Superbox, GigaCube vb.)
-
-### Kurulum
-
-1. Bu repoyu indirin veya klonlayin:
-   ```
-   git clone https://github.com/kaanalkanlic/zte-global-lte-band-optimizer.git
-   ```
-2. Klasoru acin, hepsi bu kadar. Kurulum gerekmez.
-
-### Kullanim
-
-**En kolay yol** - `baslat.bat` dosyasini cift tiklayin. Gerisini script halleder.
-
-**PowerShell ile:**
-
-```powershell
-# Tum bantlari test et, en iyisini sec
-.\internet-avcisi.ps1
-
-# Belirli bir banda gec
-.\internet-avcisi.ps1 --set 3
-
-# Sinyal durumu + oyun performansi
-.\internet-avcisi.ps1 --status
-
-# Izle, kotulesirse tekrar optimize et
-.\internet-avcisi.ps1 --watch
-
-# Ozel esiklerle izle (ping 60ms, jitter 20ms)
-.\internet-avcisi.ps1 --watch 60 20
-
-# Bant kilidini kaldir, otomatik mod
-.\internet-avcisi.ps1 --auto
-
-# Test edilen sunuculari goster
-.\internet-avcisi.ps1 --servers
-
-# Dil degistir
-.\internet-avcisi.ps1 --lang
-
-# Ayarlari sifirla
-.\internet-avcisi.ps1 --reset
-
-# Yardim
-.\internet-avcisi.ps1 --help
-```
-
-### Skor Sistemi
-
-```
-Skor = Ping(%40) + Jitter(%35) + Paket Kaybi(%25)
-Dusuk skor = Daha iyi oyun deneyimi
-```
-
-| Ping      | Degerlendirme |
-|-----------|---------------|
-| 0-30 ms   | MUKEMMEL      |
-| 30-50 ms  | COK IYI       |
-| 50-80 ms  | IYI           |
-| 80-120 ms | OYNANIR       |
-| 120+ ms   | KOTU          |
-
-### Desteklenen Bantlar
-
-| Tip | Bantlar |
-|-----|---------|
-| FDD | 1, 2, 3, 4, 5, 7, 8, 12, 13, 17, 20, 25, 26, 28, 32 |
-| TDD | 38, 39, 40, 41, 42, 43 |
-
-### Nasil Calisir?
-
-```
-baslat.bat / PowerShell
-        |
-   Kurulum Sihirbazi (ilk calistirma)
-   [Dil -> Bolge -> IP -> Modem -> Giris]
-        |
-   Modeme HTTP ile baglan (Goform API)
-        |
-   Her bant icin:
-     1. Bant kilidini degistir
-     2. 15 sn sinyal stabilizasyonu bekle
-     3. 1 isinma pingi at (sonucu kaydetme)
-     4. 10 ping at (medyan + PDV jitter hesapla)
-     5. 5 oyun sunucusuna tekrarla
-     6. Skor hesapla
-        |
-   Stabilite kontrolu
-   (mevcut bant +-5 puan icindeyse degistirme)
-        |
-   En iyi bandi kilitle + dogrulama testi
-```
+ZTE tabanli LTE modemlerde oyun icin en iyi bandi otomatik bulan ve kilitleyen arac.
 
 ---
 
@@ -245,6 +124,127 @@ baslat.bat / PowerShell
    (keep current band if within +-5 points)
         |
    Lock best band + verification test
+```
+
+---
+
+## TR - Turkce
+
+### Ne Yapar?
+
+Internet Avcisi, ZTE tabanli LTE modeminizin tum bantlarini tek tek test eder, her bant icin birden fazla oyun sunucusuna ping atar ve en dusuk gecikme / en az kayip saglayan bandi otomatik olarak kilitler.
+
+### Ozellikler
+
+- **21 LTE bant destegi** (B1-B43, FDD + TDD) - bolgeye gore filtrelenir
+- **8 bolge** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
+- **Oyuncu odakli skorlama** - Ping (%40) + Jitter (%35) + Paket Kaybi (%25)
+- **Medyan ping hesabi** - Tek bir spike tum bandi cokmez, gercek deneyiminizi olcer
+- **PDV Jitter** - Ardisik ping farklarinin ortalamasi (RFC 3550 uyumlu)
+- **Isinma pingi** - Bant gecisi sonrasi PDP context icin warm-up
+- **Stabilite bonusu** - Mevcut bant yeterince iyiyse gereksiz gecis yapmaz
+- **Minimum sunucu esigi** - 5 sunucudan 2'sine ulasamayan bant direkt elenir
+- **Watch modu** - Surekli izler, bozulursa otomatik yeniden optimize eder
+- **ZTE Goform API** - Modem paneline HTTP ile baglanir, bant kilidini degistirir
+- **Turkce & Ingilizce** - Tam iki dilli arayuz
+- **Sifre guvenligi** - Sifre diske kaydedilmez, her calistirmada sorulur
+
+### Gereksinimler
+
+- Windows 10/11
+- Windows PowerShell 5.1+ (yerlesik, ekstra kurulum gerekmez)
+- ZTE tabanli LTE modem (MF286R, MF283V, MC801A, MF279, Superbox, GigaCube vb.)
+
+### Kurulum
+
+1. Bu repoyu indirin veya klonlayin:
+   ```
+   git clone https://github.com/kaanalkanlic/zte-global-lte-band-optimizer.git
+   ```
+2. Klasoru acin, hepsi bu kadar. Kurulum gerekmez.
+
+### Kullanim
+
+**En kolay yol** - `baslat.bat` dosyasini cift tiklayin. Gerisini script halleder.
+
+**PowerShell ile:**
+
+```powershell
+# Tum bantlari test et, en iyisini sec
+.\internet-avcisi.ps1
+
+# Belirli bir banda gec
+.\internet-avcisi.ps1 --set 3
+
+# Sinyal durumu + oyun performansi
+.\internet-avcisi.ps1 --status
+
+# Izle, kotulesirse tekrar optimize et
+.\internet-avcisi.ps1 --watch
+
+# Ozel esiklerle izle (ping 60ms, jitter 20ms)
+.\internet-avcisi.ps1 --watch 60 20
+
+# Bant kilidini kaldir, otomatik mod
+.\internet-avcisi.ps1 --auto
+
+# Test edilen sunuculari goster
+.\internet-avcisi.ps1 --servers
+
+# Dil degistir
+.\internet-avcisi.ps1 --lang
+
+# Ayarlari sifirla
+.\internet-avcisi.ps1 --reset
+
+# Yardim
+.\internet-avcisi.ps1 --help
+```
+
+### Skor Sistemi
+
+```
+Skor = Ping(%40) + Jitter(%35) + Paket Kaybi(%25)
+Dusuk skor = Daha iyi oyun deneyimi
+```
+
+| Ping      | Degerlendirme |
+|-----------|---------------|
+| 0-30 ms   | MUKEMMEL      |
+| 30-50 ms  | COK IYI       |
+| 50-80 ms  | IYI           |
+| 80-120 ms | OYNANIR       |
+| 120+ ms   | KOTU          |
+
+### Desteklenen Bantlar
+
+| Tip | Bantlar |
+|-----|---------|
+| FDD | 1, 2, 3, 4, 5, 7, 8, 12, 13, 17, 20, 25, 26, 28, 32 |
+| TDD | 38, 39, 40, 41, 42, 43 |
+
+### Nasil Calisir?
+
+```
+baslat.bat / PowerShell
+        |
+   Kurulum Sihirbazi (ilk calistirma)
+   [Dil -> Bolge -> IP -> Modem -> Giris]
+        |
+   Modeme HTTP ile baglan (Goform API)
+        |
+   Her bant icin:
+     1. Bant kilidini degistir
+     2. 15 sn sinyal stabilizasyonu bekle
+     3. 1 isinma pingi at (sonucu kaydetme)
+     4. 10 ping at (medyan + PDV jitter hesapla)
+     5. 5 oyun sunucusuna tekrarla
+     6. Skor hesapla
+        |
+   Stabilite kontrolu
+   (mevcut bant +-5 puan icindeyse degistirme)
+        |
+   En iyi bandi kilitle + dogrulama testi
 ```
 
 ---
