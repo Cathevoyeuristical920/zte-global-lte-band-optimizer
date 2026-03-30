@@ -11,18 +11,24 @@ ZTE tabanli LTE modemlerde oyun icin en iyi bandi otomatik bulan ve kilitleyen a
 
 ### What Does It Do?
 
-Internet Avcisi tests all LTE bands on your ZTE-based modem one by one, pings multiple game servers per band, and automatically locks the band with the lowest latency and least packet loss for gaming.
+Internet Avcisi optimizes your LTE connection for gaming using a **2-phase approach**:
+
+1. **Signal Scan** - Measures hardware-level signal quality (RSRP, SNR, RSRQ) on every band, applies bandwidth preference (wider bands = lower latency), and selects the top 3 candidates
+2. **Gaming Test** - Runs ping/jitter/packet loss tests only on the best candidates and locks the winner
+
+This is far more reliable than testing all bands blindly, because signal metrics are hardware-level measurements that don't fluctuate like ping tests do.
 
 ### Features
 
+- **2-phase optimization** - Signal scan first, gaming test only on top candidates
+- **Signal quality scoring** - RSRP (40%) + SNR (40%) + RSRQ (20%) from modem hardware
+- **Bandwidth preference** - Wide bands (B3, B7, B42) get bonus, narrow bands (B20, B28) get penalty
 - **21 LTE bands supported** (B1-B43, FDD + TDD) - filtered by region
 - **8 regions** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
 - **Gaming-focused scoring** - Ping (40%) + Jitter (35%) + Packet Loss (25%)
-- **Median ping calculation** - A single spike won't ruin a band, measures your real experience
+- **Median ping calculation** - A single spike won't ruin a band's score
 - **PDV Jitter** - Average of consecutive ping differences (RFC 3550 compliant)
 - **Warm-up ping** - Pre-test ping after band switch for PDP context
-- **Stability bonus** - Won't switch if current band is good enough (within 5 points)
-- **Minimum server threshold** - Band is disqualified if fewer than 2/5 servers reachable
 - **Watch mode** - Continuous monitoring, auto re-optimizes if quality degrades
 - **ZTE Goform API** - Connects to modem panel via HTTP, changes band lock
 - **Turkish & English** - Fully bilingual interface
@@ -82,9 +88,22 @@ Internet Avcisi tests all LTE bands on your ZTE-based modem one by one, pings mu
 
 ### Score System
 
+**Phase 1 - Signal Score (higher = better):**
+
+```
+Signal = RSRP(40%) + SNR(40%) + RSRQ(20%) x Bandwidth Multiplier
+```
+
+| Band Type | Bandwidth | Multiplier | Examples |
+|-----------|-----------|------------|----------|
+| Wide      | 15-20 MHz | x1.3 bonus | B3, B7, B38, B41, B42 |
+| Medium    | 10-15 MHz | x1.0-1.2   | B1, B2, B4, B40 |
+| Narrow    | 5-10 MHz  | x0.7 penalty | B5, B8, B20, B28 |
+
+**Phase 2 - Gaming Score (lower = better):**
+
 ```
 Score = Ping(40%) + Jitter(35%) + Packet Loss(25%)
-Lower score = Better gaming experience
 ```
 
 | Ping      | Rating    |
@@ -112,16 +131,24 @@ baslat.bat / PowerShell
         |
    Connect to modem via HTTP (Goform API)
         |
-   For each band:
+   PHASE 1: SIGNAL SCAN
+   For each band in region:
      1. Set band lock
-     2. Wait 15s for signal stabilization
-     3. Send 1 warm-up ping (result discarded)
-     4. Send 10 pings (median + PDV jitter)
-     5. Repeat for 5 game servers
-     6. Calculate score
+     2. Wait 20s for signal stabilization
+     3. Read RSRP, SNR, RSRQ from modem API
+     4. Apply bandwidth multiplier
+     5. Calculate signal score
         |
-   Stability check
-   (keep current band if within +-5 points)
+   Select top 3 bands by signal score
+        |
+   PHASE 2: GAMING TEST
+   For each top candidate:
+     1. Set band lock
+     2. Wait 20s for signal stabilization
+     3. Send warm-up ping (discarded)
+     4. Send 10 pings to 5 servers
+     5. Calculate median ping + PDV jitter
+     6. Calculate gaming score
         |
    Lock best band + verification test
 ```
@@ -132,18 +159,24 @@ baslat.bat / PowerShell
 
 ### Ne Yapar?
 
-Internet Avcisi, ZTE tabanli LTE modeminizin tum bantlarini tek tek test eder, her bant icin birden fazla oyun sunucusuna ping atar ve en dusuk gecikme / en az kayip saglayan bandi otomatik olarak kilitler.
+Internet Avcisi, LTE baglantisinizi oyun icin **2 asamali yaklasimla** optimize eder:
+
+1. **Sinyal Taramasi** - Her bandin donanim seviyesinde sinyal kalitesini (RSRP, SNR, RSRQ) olcer, bant genisligi tercihini uygular (genis bant = dusuk gecikme) ve en iyi 3 adayi secer
+2. **Oyun Testi** - Sadece en iyi adaylara ping/jitter/kayip testi yapar ve kazanani kilitler
+
+Bu, tum bantlari koru korune test etmekten cok daha guvenilirdir cunku sinyal metrikleri ping testleri gibi dalgalanmayan donanim seviyesi olcumlerdir.
 
 ### Ozellikler
 
+- **2 asamali optimizasyon** - Once sinyal taramasi, oyun testi sadece en iyi adaylara
+- **Sinyal kalitesi skorlamasi** - RSRP (%40) + SNR (%40) + RSRQ (%20) modem donanimdan
+- **Bant genisligi tercihi** - Genis bantlar (B3, B7, B42) bonus, dar bantlar (B20, B28) ceza alir
 - **21 LTE bant destegi** (B1-B43, FDD + TDD) - bolgeye gore filtrelenir
 - **8 bolge** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
 - **Oyuncu odakli skorlama** - Ping (%40) + Jitter (%35) + Paket Kaybi (%25)
-- **Medyan ping hesabi** - Tek bir spike tum bandi cokmez, gercek deneyiminizi olcer
+- **Medyan ping hesabi** - Tek bir spike tum bandin skorunu cokmez
 - **PDV Jitter** - Ardisik ping farklarinin ortalamasi (RFC 3550 uyumlu)
 - **Isinma pingi** - Bant gecisi sonrasi PDP context icin warm-up
-- **Stabilite bonusu** - Mevcut bant yeterince iyiyse gereksiz gecis yapmaz
-- **Minimum sunucu esigi** - 5 sunucudan 2'sine ulasamayan bant direkt elenir
 - **Watch modu** - Surekli izler, bozulursa otomatik yeniden optimize eder
 - **ZTE Goform API** - Modem paneline HTTP ile baglanir, bant kilidini degistirir
 - **Turkce & Ingilizce** - Tam iki dilli arayuz
@@ -203,9 +236,22 @@ Internet Avcisi, ZTE tabanli LTE modeminizin tum bantlarini tek tek test eder, h
 
 ### Skor Sistemi
 
+**Faz 1 - Sinyal Skoru (yuksek = iyi):**
+
+```
+Sinyal = RSRP(%40) + SNR(%40) + RSRQ(%20) x Bant Genisligi Carpani
+```
+
+| Bant Tipi | Genislik  | Carpan    | Ornekler |
+|-----------|-----------|-----------|----------|
+| Genis     | 15-20 MHz | x1.3 bonus | B3, B7, B38, B41, B42 |
+| Orta      | 10-15 MHz | x1.0-1.2   | B1, B2, B4, B40 |
+| Dar       | 5-10 MHz  | x0.7 ceza  | B5, B8, B20, B28 |
+
+**Faz 2 - Oyun Skoru (dusuk = iyi):**
+
 ```
 Skor = Ping(%40) + Jitter(%35) + Paket Kaybi(%25)
-Dusuk skor = Daha iyi oyun deneyimi
 ```
 
 | Ping      | Degerlendirme |
@@ -233,16 +279,24 @@ baslat.bat / PowerShell
         |
    Modeme HTTP ile baglan (Goform API)
         |
-   Her bant icin:
+   FAZ 1: SINYAL TARAMASI
+   Bolgedeki her bant icin:
      1. Bant kilidini degistir
-     2. 15 sn sinyal stabilizasyonu bekle
-     3. 1 isinma pingi at (sonucu kaydetme)
-     4. 10 ping at (medyan + PDV jitter hesapla)
-     5. 5 oyun sunucusuna tekrarla
-     6. Skor hesapla
+     2. 20 sn sinyal stabilizasyonu bekle
+     3. Modem API'den RSRP, SNR, RSRQ oku
+     4. Bant genisligi carpanini uygula
+     5. Sinyal skoru hesapla
         |
-   Stabilite kontrolu
-   (mevcut bant +-5 puan icindeyse degistirme)
+   Sinyal skoruna gore en iyi 3 banti sec
+        |
+   FAZ 2: OYUN TESTI
+   Her aday icin:
+     1. Bant kilidini degistir
+     2. 20 sn sinyal stabilizasyonu bekle
+     3. Isinma pingi at (sonucu kaydetme)
+     4. 5 sunucuya 10'ar ping at
+     5. Medyan ping + PDV jitter hesapla
+     6. Oyun skoru hesapla
         |
    En iyi bandi kilitle + dogrulama testi
 ```
