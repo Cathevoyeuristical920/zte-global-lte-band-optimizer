@@ -42,11 +42,16 @@ This is far more reliable than testing all bands blindly, because signal metrics
 
 ### Installation
 
-1. Download or clone this repo:
-   ```
-   git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
-   ```
-2. Open the folder, that's it. No installation required.
+1. **[Download the latest release](https://github.com/wilsonbia7/zte-global-lte-band-optimizer/releases/latest)** (.zip file)
+2. Extract the zip
+3. Double-click `baslat.bat`
+
+That's it. No installation required.
+
+**Alternative (for developers):**
+```
+git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
+```
 
 ### Usage
 
@@ -190,11 +195,16 @@ Bu, tum bantlari koru korune test etmekten cok daha guvenilirdir cunku sinyal me
 
 ### Kurulum
 
-1. Bu repoyu indirin veya klonlayin:
-   ```
-   git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
-   ```
-2. Klasoru acin, hepsi bu kadar. Kurulum gerekmez.
+1. **[Son surumu indirin](https://github.com/wilsonbia7/zte-global-lte-band-optimizer/releases/latest)** (.zip dosyasi)
+2. Zip'i cikartin
+3. `baslat.bat` dosyasina cift tiklayin
+
+Hepsi bu kadar. Kurulum gerekmez.
+
+**Alternatif (gelistiriciler icin):**
+```
+git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
+```
 
 ### Kullanim
 
