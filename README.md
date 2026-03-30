@@ -38,7 +38,7 @@ Internet Avcisi tests all LTE bands on your ZTE-based modem one by one, pings mu
 
 1. Download or clone this repo:
    ```
-   git clone https://github.com/kaanalkanlic/zte-global-lte-band-optimizer.git
+   git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
    ```
 2. Open the folder, that's it. No installation required.
 
@@ -159,7 +159,7 @@ Internet Avcisi, ZTE tabanli LTE modeminizin tum bantlarini tek tek test eder, h
 
 1. Bu repoyu indirin veya klonlayin:
    ```
-   git clone https://github.com/kaanalkanlic/zte-global-lte-band-optimizer.git
+   git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
    ```
 2. Klasoru acin, hepsi bu kadar. Kurulum gerekmez.
 
@@ -255,4 +255,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ## Author
 
-**Kaan** ([@kaanalkanlic](https://github.com/kaanalkanlic))
+**Kaan** ([@wilsonbia7](https://github.com/wilsonbia7))
