@@ -1,0 +1,26 @@
+# ======================== Internet Avcisi ========================
+# Modem config (contains IP, username - password is not saved but still sensitive)
+.lte-optimizer.conf
+
+# ======================== Windows ========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ======================== PowerShell ========================
+*.ps1xml
+*.pssc
+*.cdxml
+
+# ======================== Editors ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+
+# ======================== OS ========================
+.DS_Store
