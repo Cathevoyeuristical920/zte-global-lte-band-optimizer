@@ -31,7 +31,7 @@ try { $null = chcp 65001 2>&1 } catch {}
 # ======================== CONFIG VARIABLES ========================
 $script:ConfigFile       = Join-Path $env:USERPROFILE ".lte-optimizer.conf"
 $script:PingCount        = 10
-$script:WaitAfterSwitch  = 15
+$script:WaitAfterSwitch  = 20
 $script:Region           = ""
 $script:LangPref         = ""
 $script:ModemIP          = ""
@@ -160,6 +160,19 @@ $script:MSG_TR = @{
     "srv_title"="Oyun Test Sunuculari (Bolge: {0})"
     "srv_note1"="Bu sunuculara her bant icin ping atilarak"
     "srv_note2"="en dusuk gecikme saglayan bant secilir."
+    "phase1_title"="FAZ 1: SINYAL TARAMASI"
+    "phase1_desc"="Her bandin sinyal kalitesi olculuyor..."
+    "phase2_title"="FAZ 2: OYUN TESTI (EN IYI ADAYLAR)"
+    "phase2_desc"="En iyi {0} bant detayli test ediliyor..."
+    "no_signal"="SINYAL YOK"
+    "weak_signal"="ZAYIF"
+    "top_bands"="Sinyal bazli en iyi {0} bant secildi"
+    "col_rsrp"="RSRP"; "col_snr"="SNR"; "col_signal"="SINYAL"
+    "signal_excellent"="MUKEMMEL"; "signal_good"="IYI"; "signal_fair"="ORTA"
+    "signal_poor"="ZAYIF"; "signal_none"="YOK"
+    "no_viable_band"="Yeterli sinyale sahip bant bulunamadi!"
+    "combined_best"="Sinyal + Oyun testi sonucu en iyi bant"
+    "bw_wide"="Genis bant (bonus)"; "bw_narrow"="Dar bant (ceza)"
 }
 
 $script:MSG_EN = @{
@@ -272,6 +285,19 @@ $script:MSG_EN = @{
     "srv_title"="Game Test Servers (Region: {0})"
     "srv_note1"="These servers are pinged on each band to find"
     "srv_note2"="the lowest latency for gaming."
+    "phase1_title"="PHASE 1: SIGNAL SCAN"
+    "phase1_desc"="Measuring signal quality on each band..."
+    "phase2_title"="PHASE 2: GAMING TEST (TOP CANDIDATES)"
+    "phase2_desc"="Testing top {0} bands in detail..."
+    "no_signal"="NO SIGNAL"
+    "weak_signal"="WEAK"
+    "top_bands"="Top {0} bands selected by signal quality"
+    "col_rsrp"="RSRP"; "col_snr"="SNR"; "col_signal"="SIGNAL"
+    "signal_excellent"="EXCELLENT"; "signal_good"="GOOD"; "signal_fair"="FAIR"
+    "signal_poor"="POOR"; "signal_none"="NONE"
+    "no_viable_band"="No band with usable signal found!"
+    "combined_best"="Best band by signal + gaming test"
+    "bw_wide"="Wide band (bonus)"; "bw_narrow"="Narrow band (penalty)"
 }
 
 function T([string]$Key) {
@@ -411,11 +437,11 @@ function Set-RegionConfig {
     switch ($script:Region) {
         "TR" {
             $script:BandOrder = @("Band 3 (1800 MHz FDD)","Band 7 (2600 MHz FDD)","Band 1 (2100 MHz FDD)","Band 20 (800 MHz FDD)","Band 8 (900 MHz FDD)","Band 38 (2600 TDD)","Band 40 (2300 TDD)","Band 42 (3500 TDD)")
-            $script:GameServerOrder = @("Riot EU","Valve EU","EA EU","Cloudflare","Google")
+            $script:GameServerOrder = @("Valve EU","Cloudflare","Google","Quad9","OpenDNS")
         }
         "EU" {
             $script:BandOrder = @("Band 1 (2100 MHz FDD)","Band 3 (1800 MHz FDD)","Band 7 (2600 MHz FDD)","Band 8 (900 MHz FDD)","Band 20 (800 MHz FDD)","Band 28 (700 APT FDD)","Band 32 (1500 SDL)","Band 38 (2600 TDD)","Band 42 (3500 TDD)")
-            $script:GameServerOrder = @("Riot EU","Valve EU","EA EU","Cloudflare","Google")
+            $script:GameServerOrder = @("Valve EU","Cloudflare","Google","Quad9","OpenDNS")
         }
         "NA" {
             $script:BandOrder = @("Band 2 (1900 MHz FDD)","Band 4 (AWS 1700 FDD)","Band 5 (850 MHz FDD)","Band 7 (2600 MHz FDD)","Band 12 (700a MHz FDD)","Band 13 (700c MHz FDD)","Band 17 (700b MHz FDD)","Band 25 (1900+ MHz FDD)","Band 26 (850+ MHz FDD)","Band 41 (2500 TDD)")
@@ -431,11 +457,11 @@ function Set-RegionConfig {
         }
         "ME" {
             $script:BandOrder = @("Band 1 (2100 MHz FDD)","Band 3 (1800 MHz FDD)","Band 7 (2600 MHz FDD)","Band 8 (900 MHz FDD)","Band 20 (800 MHz FDD)","Band 28 (700 APT FDD)","Band 38 (2600 TDD)","Band 40 (2300 TDD)","Band 41 (2500 TDD)")
-            $script:GameServerOrder = @("Valve Dubai","Riot EU","Cloudflare","Google","Quad9")
+            $script:GameServerOrder = @("Valve Dubai","Cloudflare","Google","Quad9","OpenDNS")
         }
         "AF" {
             $script:BandOrder = @("Band 1 (2100 MHz FDD)","Band 3 (1800 MHz FDD)","Band 7 (2600 MHz FDD)","Band 8 (900 MHz FDD)","Band 20 (800 MHz FDD)","Band 28 (700 APT FDD)","Band 38 (2600 TDD)","Band 40 (2300 TDD)")
-            $script:GameServerOrder = @("Valve SA","Riot EU","Cloudflare","Google","Quad9")
+            $script:GameServerOrder = @("Valve SA","Cloudflare","Google","Quad9","OpenDNS")
         }
         "OCEA" {
             $script:BandOrder = @("Band 1 (2100 MHz FDD)","Band 3 (1800 MHz FDD)","Band 5 (850 MHz FDD)","Band 7 (2600 MHz FDD)","Band 8 (900 MHz FDD)","Band 28 (700 APT FDD)","Band 40 (2300 TDD)","Band 42 (3500 TDD)")
@@ -443,18 +469,19 @@ function Set-RegionConfig {
         }
         default {
             $script:BandOrder = @("Band 1 (2100 MHz FDD)","Band 3 (1800 MHz FDD)","Band 7 (2600 MHz FDD)","Band 8 (900 MHz FDD)","Band 20 (800 MHz FDD)","Band 28 (700 APT FDD)","Band 38 (2600 TDD)","Band 40 (2300 TDD)","Band 41 (2500 TDD)")
-            $script:GameServerOrder = @("Cloudflare","Google","Quad9","Valve EU","Riot EU")
+            $script:GameServerOrder = @("Cloudflare","Google","Quad9","Valve EU","OpenDNS")
         }
     }
 
     $serverIPs = @{
-        "Riot EU"="185.40.64.65"; "Riot NA"="104.160.131.3"; "Riot ASIA"="104.160.141.3"
+        "Riot NA"="104.160.131.3"; "Riot ASIA"="104.160.141.3"
         "Riot LATAM"="104.160.131.3"; "Riot OCE"="162.249.72.1"
         "Valve EU"="155.133.248.34"; "Valve NA"="162.254.197.36"; "Valve SG"="103.10.124.1"
         "Valve JP"="45.121.184.1"; "Valve SA"="205.185.194.20"; "Valve AU"="103.10.124.10"
         "Valve Dubai"="155.133.238.34"
-        "EA EU"="159.153.64.175"; "EA NA"="159.153.92.175"
+        "EA NA"="159.153.92.175"
         "Cloudflare"="1.1.1.1"; "Google"="8.8.8.8"; "Quad9"="9.9.9.9"; "Level3"="4.2.2.1"
+        "OpenDNS"="208.67.222.222"
     }
     foreach ($srv in $script:GameServerOrder) {
         if ($serverIPs.ContainsKey($srv)) { $script:GameServers[$srv] = $serverIPs[$srv] }
@@ -765,6 +792,73 @@ function Initialize-Config {
     $script:Modem = "http://$($script:ModemIP)"
 }
 
+# ======================== SIGNAL SCORING ========================
+# Bant genislik tercihi: genis bantlar oyunda daha dusuk gecikme saglar
+# Dusuk frekans = dar bant (5-10MHz), yuksek frekans = genis bant (15-20MHz)
+$script:BandWidthBonus = @{
+    "Band 3 (1800 MHz FDD)"  = 1.3   # Genis bant, oyun icin ideal
+    "Band 7 (2600 MHz FDD)"  = 1.3   # Genis bant
+    "Band 1 (2100 MHz FDD)"  = 1.1   # Orta-genis
+    "Band 2 (1900 MHz FDD)"  = 1.1
+    "Band 4 (AWS 1700 FDD)"  = 1.1
+    "Band 25 (1900+ MHz FDD)"= 1.1
+    "Band 38 (2600 TDD)"     = 1.3   # TDD genis bant
+    "Band 40 (2300 TDD)"     = 1.2   # TDD genis
+    "Band 41 (2500 TDD)"     = 1.3   # TDD genis
+    "Band 42 (3500 TDD)"     = 1.3   # TDD genis, en yeni
+    "Band 43 (3700 TDD)"     = 1.3
+    "Band 5 (850 MHz FDD)"   = 0.7   # Dar bant
+    "Band 8 (900 MHz FDD)"   = 0.7   # Dar bant
+    "Band 12 (700a MHz FDD)" = 0.7
+    "Band 13 (700c MHz FDD)" = 0.7
+    "Band 17 (700b MHz FDD)" = 0.7
+    "Band 20 (800 MHz FDD)"  = 0.7   # Dar bant
+    "Band 26 (850+ MHz FDD)" = 0.7
+    "Band 28 (700 APT FDD)"  = 0.7   # Dar bant, sinyal iyi ama gecikme yuksek
+    "Band 32 (1500 SDL)"     = 0.8
+    "Band 39 (1900 TDD)"     = 1.0
+}
+
+function Get-SignalScore([string]$RawRSRP, [string]$RawRSRQ, [string]$RawSNR, [string]$BandName) {
+    # ZTE API string degerlerini parse et
+    $rsrp = 0; $rsrq = 0; $snr = 0
+    if ($RawRSRP -match '-?\d+') { $rsrp = [int]$Matches[0] }
+    if ($RawRSRQ -match '-?\d+') { $rsrq = [int]$Matches[0] }
+    if ($RawSNR  -match '-?\d+') { $snr  = [int]$Matches[0] }
+
+    # Sinyal yoksa
+    if ($rsrp -eq 0 -or $rsrp -lt -120) { return @{Score=0; RSRP=$rsrp; RSRQ=$rsrq; SNR=$snr; Valid=$false} }
+
+    # RSRP: -70 (mukemmel) ~ -110 (cok kotu), 0-100 arasi normalize
+    $rsrpScore = [Math]::Max(0, [Math]::Min(100, [int](($rsrp + 110) * 100 / 40)))
+
+    # SNR: 0 (kotu) ~ 25+ (mukemmel), 0-100 arasi normalize
+    $snrScore = [Math]::Max(0, [Math]::Min(100, [int]($snr * 100 / 25)))
+
+    # RSRQ: -20 (kotu) ~ -3 (mukemmel), 0-100 arasi normalize
+    $rsrqScore = [Math]::Max(0, [Math]::Min(100, [int](($rsrq + 20) * 100 / 17)))
+
+    # Ham sinyal skoru: RSRP %40 + SNR %40 + RSRQ %20
+    $rawScore = [int]($rsrpScore * 0.4 + $snrScore * 0.4 + $rsrqScore * 0.2)
+
+    # Bant genislik bonusu: genis bantlar oyun icin tercih edilir
+    $bwBonus = 1.0
+    if ($BandName -and $script:BandWidthBonus.ContainsKey($BandName)) {
+        $bwBonus = $script:BandWidthBonus[$BandName]
+    }
+    $total = [Math]::Min(100, [int]($rawScore * $bwBonus))
+
+    return @{Score=$total; RSRP=$rsrp; RSRQ=$rsrq; SNR=$snr; Valid=$true; BWBonus=$bwBonus}
+}
+
+function Get-SignalRating([int]$Score) {
+    if ($Score -ge 75) { return @{Text=(T "signal_excellent"); Color="Green"} }
+    if ($Score -ge 50) { return @{Text=(T "signal_good");      Color="Green"} }
+    if ($Score -ge 25) { return @{Text=(T "signal_fair");      Color="Yellow"} }
+    if ($Score -gt 0)  { return @{Text=(T "signal_poor");      Color="Red"} }
+    return @{Text=(T "signal_none"); Color="DarkGray"}
+}
+
 # ======================== PING RATING ========================
 function Get-PingRating([int]$Avg) {
     if ($Avg -le 30)  { return @{Text=(T "excellent"); Color="Green"} }
@@ -950,26 +1044,19 @@ function Run-GamingTest {
             $totalLoss   += [int]$p[2]
             $totalJitter += [int]$p[5]
             $reachable++
-        } else {
-            # Ulasilamayan sunucuya agir ceza
-            $totalAvg    += 500
-            $totalLoss   += 100
-            $totalJitter += 100
         }
         $srvCount++
     }
 
-    if ($srvCount -eq 0) { return "FAIL|0|0|100|0" }
-    # En az 2 sunucuya ulasamiyorsa bu bant guvenilmez
     if ($reachable -lt 2) { return "FAIL|0|0|100|0" }
-    $aP = [int]($totalAvg / $srvCount); $aJ = [int]($totalJitter / $srvCount); $aL = [int]($totalLoss / $srvCount)
-    return "OK|$aP|$aJ|$aL|$srvCount"
+    $aP = [int]($totalAvg / $reachable); $aJ = [int]($totalJitter / $reachable); $aL = [int]($totalLoss / $reachable)
+    return "OK|$aP|$aJ|$aL|$reachable"
 }
 
 function Get-GameScore([int]$AvgPing, [int]$Jitter, [int]$Loss) {
-    $ps = [Math]::Min(100, [int]($AvgPing * 100 / 300))
-    $js = [Math]::Min(100, $Jitter * 2)   # PDV degerleri range'den 2-3x kucuk, kompanze et
-    $ls = [Math]::Min(100, $Loss * 4)      # Paket kaybi agir cezalandirilir
+    $ps = [Math]::Min(100, [int]($AvgPing * 100 / 150))   # 150ms = max, oyunda 150+ zaten oynanamaz
+    $js = [Math]::Min(100, $Jitter * 4)                     # PDV 25ms+ = max, LTE jitter hassas olculmeli
+    $ls = [Math]::Min(100, $Loss * 10)                      # %10 kayip = max, %1 bile oyunda hissedilir
     return [int](($ps * $script:WeightAvgPing + $js * $script:WeightJitter + $ls * $script:WeightPacketLoss) / 100)
 }
 
@@ -991,6 +1078,11 @@ function Show-Status {
     Write-Host "  RSRP       : $($info.lte_rsrp) dBm"
     Write-Host "  RSRQ       : $($info.lte_rsrq) dB"
     Write-Host "  SNR        : $($info.lte_snr) dB"
+    $curBandName = ""; foreach ($bn in $script:Bands.Keys) { if ($bn -match "Band $($info.lte_ca_pcell_band) ") { $curBandName = $bn; break } }
+    $sigStatus = Get-SignalScore $info.lte_rsrp $info.lte_rsrq $info.lte_snr $curBandName
+    $sigRating = Get-SignalRating $sigStatus.Score
+    Write-Host "  $(T 'col_signal')    : $($sigStatus.Score)/100 " -NoNewline
+    Write-Host "($($sigRating.Text))" -ForegroundColor $sigRating.Color
     Write-Host "  $(T 'signal_label')   : $($info.signalbar)/5"
     Write-Host "  Cell ID    : $($info.cell_id)"
     Write-Host "  WAN IP     : $($info.wan_ipaddr)"
@@ -1047,11 +1139,8 @@ function Start-Optimization {
     Write-Host "$([char]0x2551)" -ForegroundColor White
     Write-Host ([char]0x255A + ([string][char]0x2550)*56 + [char]0x255D) -ForegroundColor White
     Write-Host ""
-    Write-Host "  $(T 'score_weights')"
-    Write-Host "    Ping: %$($script:WeightAvgPing) | Jitter: %$($script:WeightJitter) | $(T 'col_loss'): %$($script:WeightPacketLoss)"
-    Write-Host "  $(T 'server_count'): $($script:GameServers.Count)"
-    Write-Host "  $(T 'ping_count'): $($script:PingCount)"
     Write-Host "  $(T 'band_count'): $($script:BandOrder.Count)"
+    Write-Host "  $(T 'server_count'): $($script:GameServers.Count)"
     Write-Host ""
 
     if (-not (Login-Modem)) { return }
@@ -1074,54 +1163,113 @@ function Start-Optimization {
     Write-Host ""
 
     # Test current connection
-    Start-Spinner (T "testing_current")
-    $curBand   = Get-CurrentBand
-    $curResult = Run-GamingTest
-    Stop-Spinner
-
-    $cp = $curResult -split '\|'
-    if ($cp[0] -eq "OK") {
-        $cAvg = [int]$cp[1]; $cJit = [int]$cp[2]; $cLoss = [int]$cp[3]
-        $cScore = Get-GameScore $cAvg $cJit $cLoss
-        $cPR = Get-PingRating $cAvg; $cJR = Get-JitterRating $cJit
+    $curBand = Get-CurrentBand
+    $curInfo = Get-SignalInfo
+    if ($curBand) {
+        $curBandName = ""; foreach ($bn in $script:Bands.Keys) { if ($bn -match "Band $curBand ") { $curBandName = $bn; break } }
+        $curSig = Get-SignalScore $curInfo.lte_rsrp $curInfo.lte_rsrq $curInfo.lte_snr $curBandName
+        $curSR  = Get-SignalRating $curSig.Score
         Write-Host "  $(T 'current_pre') $curBand"
-        Write-Host "    Ping: " -NoNewline; Write-Host "${cAvg}ms" -NoNewline
-        Write-Host " (" -NoNewline; Write-Host $cPR.Text -ForegroundColor $cPR.Color -NoNewline
-        Write-Host ") | Jitter: " -NoNewline; Write-Host "${cJit}ms" -NoNewline
-        Write-Host " (" -NoNewline; Write-Host $cJR.Text -ForegroundColor $cJR.Color -NoNewline
-        Write-Host ") | $(T 'col_loss'): ${cLoss}%"
-        Write-Host "    $(T 'game_score'): " -NoNewline; Write-Host "${cScore}/100" -NoNewline
-        Write-Host " ($(T 'lower_better'))"
-    } else {
-        Write-Host "  $(T 'current_pre') $curBand - " -NoNewline; Write-Host (T "no_conn") -ForegroundColor Red
+        Write-Host "    RSRP: $($curSig.RSRP)dBm | SNR: $($curSig.SNR)dB | $(T 'col_signal'): " -NoNewline
+        Write-Host "$($curSig.Score)/100" -NoNewline
+        Write-Host " (" -NoNewline; Write-Host $curSR.Text -ForegroundColor $curSR.Color -NoNewline; Write-Host ")"
     }
     Write-Host ""
 
-    # Test all bands
-    $bestBand = ""; $bestScore = 99999; $bestHex = ""; $bestAvg = 0; $bestJit = 0; $bestLoss = 0
-    $curLockedScore = $null; $curLockedBand = ""; $curLockedHex = ""
-    $curLockedAvg = 0; $curLockedJit = 0; $curLockedLoss = 0
-
-    Write-Host (T "testing_all") -ForegroundColor White
+    # ============================================================
+    # FAZ 1: SINYAL TARAMASI — Donanim seviyesi, hizli ve guvenilir
+    # ============================================================
+    Write-Host ("$([char]0x2550)" * 70) -ForegroundColor Cyan
+    Write-Host "  $(T 'phase1_title')" -ForegroundColor Cyan
+    Write-Host "  $(T 'phase1_desc')" -ForegroundColor DarkGray
+    Write-Host ("$([char]0x2550)" * 70) -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host ("{0,-22} {1,8} {2,8} {3,8} {4,8} {5,10}" -f (T "col_band"),(T "col_rsrp"),(T "col_snr"),"RSRQ",(T "col_signal"),(T "col_status"))
+    Write-Host "  [+] = $(T 'bw_wide')  [-] = $(T 'bw_narrow')" -ForegroundColor DarkGray
     Write-Host ("$([char]0x2500)" * 70)
-    Write-Host ("{0,-22} {1,7} {2,7} {3,6} {4,6} {5,8}" -f (T "col_band"),"PING","JITTER",(T "col_loss"),(T "col_score"),(T "col_status"))
-    Write-Host ("$([char]0x2500)" * 70)
 
+    $signalResults = @()
     $bIdx = 0; $bTotal = $script:BandOrder.Count
 
     foreach ($bandName in $script:BandOrder) {
         $hexVal = $script:Bands[$bandName]; $bIdx++
 
+        Start-Spinner "[$bIdx/$bTotal] $bandName $(T 'switching_band')"
+        $null = Set-Band $hexVal
+        Stop-Spinner
+        Wait-Countdown 20 (T "signal_stab")
+
+        $info = Get-SignalInfo
+        $sig = Get-SignalScore $info.lte_rsrp $info.lte_rsrq $info.lte_snr $bandName
+
+        if ($sig.Valid) {
+            $sr = Get-SignalRating $sig.Score
+            $bwTag = ""; if ($sig.BWBonus -gt 1.0) { $bwTag = " [+]" } elseif ($sig.BWBonus -lt 1.0) { $bwTag = " [-]" }
+            $line = "{0,-22} {1,6}dBm {2,6}dB {3,6}dB {4,5}/100" -f $bandName, $sig.RSRP, $sig.SNR, $sig.RSRQ, $sig.Score
+            Write-Host "  $line " -ForegroundColor $sr.Color -NoNewline
+            Write-Host "$($sr.Text)$bwTag" -ForegroundColor $sr.Color
+            $signalResults += @{
+                Name=$bandName; Hex=$hexVal; Score=$sig.Score
+                RSRP=$sig.RSRP; SNR=$sig.SNR; RSRQ=$sig.RSRQ
+            }
+            # Mevcut bandi isaretle
+            if ($bandName -match 'Band (\d+)' -and $Matches[1] -eq $curBand) {
+                $signalResults[-1].IsCurrent = $true
+            }
+        } else {
+            Write-Host ("  {0,-22} {1}" -f $bandName, (T "no_signal")) -ForegroundColor DarkGray
+        }
+    }
+
+    Write-Host ("$([char]0x2500)" * 70)
+    Write-Host ""
+
+    if ($signalResults.Count -eq 0) {
+        Write-Err (T "no_viable_band")
+        Set-Auto
+        return
+    }
+
+    # Sinyal bazli en iyi 3 banti sec
+    $topCount = [Math]::Min(3, $signalResults.Count)
+    $topBands = $signalResults | Sort-Object { $_.Score } -Descending | Select-Object -First $topCount
+
+    Write-Ok ((T "top_bands") -f $topCount)
+    foreach ($tb in $topBands) {
+        $marker = ""; if ($tb.IsCurrent) { $marker = " *" }
+        Write-Host "    $($tb.Name) - $(T 'col_signal'): $($tb.Score)/100 (RSRP: $($tb.RSRP)dBm, SNR: $($tb.SNR)dB)${marker}" -ForegroundColor Cyan
+    }
+    Write-Host ""
+
+    # ============================================================
+    # FAZ 2: OYUN TESTI — Sadece en iyi adaylar, detayli test
+    # ============================================================
+    Write-Host ("$([char]0x2550)" * 70) -ForegroundColor Magenta
+    Write-Host "  $(T 'phase2_title')" -ForegroundColor Magenta
+    Write-Host ("  " + ((T "phase2_desc") -f $topCount)) -ForegroundColor DarkGray
+    Write-Host ("$([char]0x2550)" * 70) -ForegroundColor Magenta
+    Write-Host ""
+    Write-Host ("{0,-22} {1,7} {2,7} {3,6} {4,6} {5,8}" -f (T "col_band"),"PING","JITTER",(T "col_loss"),(T "col_score"),(T "col_status"))
+    Write-Host ("$([char]0x2500)" * 70)
+
+    $bestBand = ""; $bestScore = 99999; $bestHex = ""; $bestAvg = 0; $bestJit = 0; $bestLoss = 0
+    $bestSigScore = 0
+
+    $tIdx = 0
+    foreach ($tb in $topBands) {
+        $tIdx++
+        $bandName = $tb.Name; $hexVal = $tb.Hex
+
         Write-Host ""
-        Write-Host "  [$bIdx/$bTotal] " -ForegroundColor Magenta -NoNewline
-        Write-Host $bandName -ForegroundColor White
+        Write-Host "  [$tIdx/$topCount] " -ForegroundColor Magenta -NoNewline
+        Write-Host "$bandName ($(T 'col_signal'): $($tb.Score)/100)" -ForegroundColor White
 
         Start-Spinner "$bandName $(T 'switching_band')"
         $null = Set-Band $hexVal
         Stop-Spinner
         Write-Host "  " -NoNewline; Write-Host "$([char]0x2713)" -ForegroundColor Green -NoNewline
         Write-Host " $(T 'band_changed')"
-        Wait-Countdown $script:WaitAfterSwitch (T "signal_stab")
+        Wait-Countdown 20 (T "signal_stab")
 
         Start-Spinner "$bandName - $($script:GameServers.Count) $(T 'pinging')"
         $result = Run-GamingTest
@@ -1141,11 +1289,7 @@ function Start-Optimization {
             if ($score -lt $bestScore) {
                 $bestScore = $score; $bestBand = $bandName; $bestHex = $hexVal
                 $bestAvg = $avg; $bestJit = $jit; $bestLoss = $loss
-            }
-            # Mevcut bandin kilitli performansini kaydet (stabilite karsilastirmasi icin)
-            if ($bandName -match 'Band (\d+)' -and $Matches[1] -eq $curBand) {
-                $curLockedScore = $score; $curLockedBand = $bandName; $curLockedHex = $hexVal
-                $curLockedAvg = $avg; $curLockedJit = $jit; $curLockedLoss = $loss
+                $bestSigScore = $tb.Score
             }
         } else {
             Write-Host ("  {0,-22} {1}" -f $bandName, (T "no_conn")) -ForegroundColor Red
@@ -1155,26 +1299,11 @@ function Start-Optimization {
     Write-Host ("$([char]0x2500)" * 70)
     Write-Host ""
 
-    # Stabilite bonusu: mevcut bant en iyinin 5 puani icindeyse, gereksiz gecis yapma
-    if ($null -ne $curLockedScore -and $bestBand -and $curLockedBand -ne $bestBand `
-        -and $curLockedScore -le ($bestScore + 5)) {
-        Write-Host ""
-        Write-Info "$(T 'stability_keep')"
-        Write-Host "    $curLockedBand ($(T 'col_score'): $curLockedScore) vs $bestBand ($(T 'col_score'): $bestScore)" -ForegroundColor DarkGray
-        $bestScore = $curLockedScore; $bestBand = $curLockedBand; $bestHex = $curLockedHex
-        $bestAvg = $curLockedAvg; $bestJit = $curLockedJit; $bestLoss = $curLockedLoss
-    }
-
     if ($bestBand) {
         Write-Host ("$([char]0x2500)" * 70) -ForegroundColor White
         $bPR = Get-PingRating $bestAvg; $bJR = Get-JitterRating $bestJit
-        Write-Host "  >>> $(T 'best_band'): $bestBand" -ForegroundColor Green
-        Write-Host "    Ping: " -NoNewline; Write-Host "${bestAvg}ms" -NoNewline
-        Write-Host " (" -NoNewline; Write-Host $bPR.Text -ForegroundColor $bPR.Color -NoNewline; Write-Host ")"
-        Write-Host "    Jitter: " -NoNewline; Write-Host "${bestJit}ms" -NoNewline
-        Write-Host " (" -NoNewline; Write-Host $bJR.Text -ForegroundColor $bJR.Color -NoNewline; Write-Host ")"
-        Write-Host "    $(T 'col_loss'): ${bestLoss}%"
-        Write-Host "    $(T 'col_score'): " -NoNewline; Write-Host "${bestScore}/100"
+        Write-Host "  >>> $(T 'combined_best'): $bestBand" -ForegroundColor Green
+        Write-Host "    $(T 'col_signal'): $bestSigScore/100 | Ping: ${bestAvg}ms | Jitter: ${bestJit}ms | $(T 'col_loss'): ${bestLoss}%"
         Write-Host ""
 
         Start-Spinner "$(T 'switching_best'): $bestBand..."
@@ -1182,7 +1311,7 @@ function Start-Optimization {
         Stop-Spinner
         Write-Host "  " -NoNewline; Write-Host "$([char]0x2713)" -ForegroundColor Green -NoNewline
         Write-Host " $(T 'band_changed')"
-        Wait-Countdown $script:WaitAfterSwitch (T "verify_wait")
+        Wait-Countdown 20 (T "verify_wait")
 
         Start-Spinner (T "verifying")
         $vResult = Run-GamingTest
@@ -1190,7 +1319,6 @@ function Start-Optimization {
 
         $vp = $vResult -split '\|'
 
-        # Dogrulama kalite kontrolu
         if ($vp[0] -eq "OK") {
             $vScore = Get-GameScore ([int]$vp[1]) ([int]$vp[2]) ([int]$vp[3])
             if ($vScore -gt [Math]::Max($bestScore * 2, 30)) {
@@ -1207,6 +1335,8 @@ function Start-Optimization {
         Write-Host ([char]0x2560 + ([string][char]0x2550)*56 + [char]0x2563) -ForegroundColor Green
         $sbLine = "  $(T 'selected_band') : $bestBand".PadRight(56)
         Write-Host "$([char]0x2551)${sbLine}$([char]0x2551)" -ForegroundColor Green
+        $sigLine = "  $(T 'col_signal')       : ${bestSigScore}/100".PadRight(56)
+        Write-Host "$([char]0x2551)${sigLine}$([char]0x2551)" -ForegroundColor Green
 
         if ($vp[0] -eq "OK") {
             $vAvg = [int]$vp[1]; $vJit = [int]$vp[2]; $vLoss = [int]$vp[3]
@@ -1342,15 +1472,45 @@ function Start-WatchReoptimize {
     if (-not (Login-Modem)) { return }
 
     $prevBand = Get-CurrentBand
-    $wBest = ""; $wBestScore = 99999; $wBestHex = ""
-    $prevScore = $null; $prevBandName = ""; $prevHex = ""
 
+    # Faz 1: Hizli sinyal taramasi
+    $signalResults = @()
     foreach ($bandName in $script:BandOrder) {
         $hexVal = $script:Bands[$bandName]
         Start-Spinner "$bandName..."
         $null = Set-Band $hexVal
         Stop-Spinner
-        Wait-Countdown $script:WaitAfterSwitch (T "signal_stab")
+        Wait-Countdown 20 (T "signal_stab")
+
+        $info = Get-SignalInfo
+        $sig = Get-SignalScore $info.lte_rsrp $info.lte_rsrq $info.lte_snr $bandName
+        if ($sig.Valid) {
+            Write-Log "${bandName}: RSRP=$($sig.RSRP)dBm SNR=$($sig.SNR)dB $(T 'col_signal')=$($sig.Score)"
+            $entry = @{Name=$bandName; Hex=$hexVal; Score=$sig.Score}
+            if ($bandName -match 'Band (\d+)' -and $Matches[1] -eq $prevBand) { $entry.IsCurrent = $true }
+            $signalResults += $entry
+        } else {
+            Write-Log "${bandName}: $(T 'no_signal')"
+        }
+    }
+
+    if ($signalResults.Count -eq 0) {
+        Write-Warn (T "no_band_auto"); Set-Auto; return
+    }
+
+    # En iyi 3 banta oyun testi
+    $topCount = [Math]::Min(3, $signalResults.Count)
+    $topBands = $signalResults | Sort-Object { $_.Score } -Descending | Select-Object -First $topCount
+
+    $wBest = ""; $wBestScore = 99999; $wBestHex = ""
+    $prevScore = $null; $prevBandName = ""; $prevHex = ""
+
+    foreach ($tb in $topBands) {
+        $bandName = $tb.Name; $hexVal = $tb.Hex
+        Start-Spinner "$bandName - test..."
+        $null = Set-Band $hexVal
+        Stop-Spinner
+        Wait-Countdown 20 (T "signal_stab")
 
         Start-Spinner "$bandName - test..."
         $result = Run-GamingTest
@@ -1364,8 +1524,7 @@ function Start-WatchReoptimize {
             if ($score -lt $wBestScore) {
                 $wBestScore = $score; $wBest = $bandName; $wBestHex = $hexVal
             }
-            # Onceki bandin kilitli skorunu kaydet
-            if ($bandName -match 'Band (\d+)' -and $Matches[1] -eq $prevBand) {
+            if ($tb.IsCurrent) {
                 $prevScore = $score; $prevBandName = $bandName; $prevHex = $hexVal
             }
         } else {
@@ -1374,7 +1533,6 @@ function Start-WatchReoptimize {
     }
 
     if ($wBest) {
-        # Stabilite: onceki bant en iyinin 5 puani icindeyse gereksiz gecis yapma
         if ($null -ne $prevScore -and $prevBandName -ne $wBest -and $prevScore -le ($wBestScore + 5)) {
             $wBest = $prevBandName; $wBestHex = $prevHex; $wBestScore = $prevScore
         }
@@ -1382,7 +1540,7 @@ function Start-WatchReoptimize {
         $null = Set-Band $wBestHex
         Stop-Spinner
         Write-Ok ((T "watch_sel") -f $wBest, $wBestScore)
-        Wait-Countdown $script:WaitAfterSwitch (T "signal_stab")
+        Wait-Countdown 20 (T "signal_stab")
     } else {
         Write-Warn (T "no_band_auto")
         Set-Auto
@@ -1543,14 +1701,14 @@ function Show-Banner {
         Write-BoxSep
         Write-BoxEmpty
         Write-BoxLine @("White","  Ne yapar?")
-        Write-BoxLine @("White","  ZTE LTE modeminizin tum bantlarini test eder, her bant")
-        Write-BoxLine @("White","  icin 5 oyun sunucusuna ping atar, ping/jitter/kayip")
-        Write-BoxLine @("White","  olcer ve en iyi bandi otomatik secer.")
+        Write-BoxLine @("White","  ZTE LTE modeminizin bantlarini 2 asamali test eder:")
+        Write-BoxLine @("White","  1) Sinyal taramasi (RSRP/SNR) ile en iyi adaylari bulur")
+        Write-BoxLine @("White","  2) Adaylara oyun testi (ping/jitter) yaparak en iyisini secer")
         Write-BoxEmpty
         Write-BoxLine @("White","  Nasil calisir?")
-        Write-BoxLine @("White","  Modem paneline (goform API) HTTP ile baglanir, bant")
-        Write-BoxLine @("White","  kilidini degistirir, sinyal olcumu yapar, en iyi")
-        Write-BoxLine @("White","  bandi kalici olarak ayarlar.")
+        Write-BoxLine @("White","  Modem paneline (goform API) HTTP ile baglanir, her bandin")
+        Write-BoxLine @("White","  sinyal kalitesini olcer, genis bantlari tercih eder,")
+        Write-BoxLine @("White","  en iyi adaylara oyun testi yapip kazanani kilitler.")
         Write-BoxEmpty
         Write-BoxLine @("White","  Bolgeler: ","Cyan","TR EU NA LATAM ASIA ME AF OCEA")
         Write-BoxLine @("White","  Bantlar:  ","Cyan","21 LTE bant (B1-B43, bolgeye gore filtrelenir)")
@@ -1568,7 +1726,7 @@ function Show-Banner {
         Write-BoxLine @("Green","  --help","White","            Detayli yardim")
         Write-BoxEmpty
         Write-BoxLine @("DarkGray","  Gereksinimler: Windows PowerShell 5.1+ (yerlesik)")
-        Write-BoxLine @("DarkGray","  Skor: Ping(%40) + Jitter(%35) + Kayip(%25) | Dusuk=Iyi")
+        Write-BoxLine @("DarkGray","  Faz1: Sinyal(RSRP+SNR+BW) | Faz2: Ping+Jitter+Kayip")
         Write-BoxSep
         Write-BoxLine @("DarkGray","  Yapimci: ","White","Kaan (wilsonbia7)")
         Write-BoxBottom
@@ -1578,14 +1736,14 @@ function Show-Banner {
         Write-BoxSep
         Write-BoxEmpty
         Write-BoxLine @("White","  What does it do?")
-        Write-BoxLine @("White","  Tests all LTE bands on your ZTE modem, pings 5 game")
-        Write-BoxLine @("White","  servers per band, measures ping/jitter/packet loss,")
-        Write-BoxLine @("White","  and locks the best band for gaming automatically.")
+        Write-BoxLine @("White","  Tests all LTE bands on your ZTE modem in 2 phases:")
+        Write-BoxLine @("White","  1) Signal scan (RSRP/SNR) to find top candidates")
+        Write-BoxLine @("White","  2) Gaming test (ping/jitter) on candidates to pick best")
         Write-BoxEmpty
         Write-BoxLine @("White","  How does it work?")
         Write-BoxLine @("White","  Connects to modem admin panel (goform API) via HTTP,")
-        Write-BoxLine @("White","  switches band lock, waits for signal, runs tests,")
-        Write-BoxLine @("White","  then sets the winning band permanently.")
+        Write-BoxLine @("White","  measures signal quality on each band, prefers wider")
+        Write-BoxLine @("White","  bands, then gaming-tests top candidates and locks best.")
         Write-BoxEmpty
         Write-BoxLine @("White","  Regions: ","Cyan","TR EU NA LATAM ASIA ME AF OCEA")
         Write-BoxLine @("White","  Bands:   ","Cyan","21 LTE bands (B1-B43, region-filtered)")
@@ -1603,7 +1761,7 @@ function Show-Banner {
         Write-BoxLine @("Green","  --help","White","            Full help")
         Write-BoxEmpty
         Write-BoxLine @("DarkGray","  Requires: Windows PowerShell 5.1+ (built-in)")
-        Write-BoxLine @("DarkGray","  Score: Ping(40%) + Jitter(35%) + Loss(25%) | Lower=Better")
+        Write-BoxLine @("DarkGray","  P1: Signal(RSRP+SNR+BW) | P2: Ping+Jitter+Loss")
         Write-BoxSep
         Write-BoxLine @("DarkGray","  Created by: ","White","Kaan (wilsonbia7)")
         Write-BoxBottom
@@ -1637,9 +1795,11 @@ function Show-Help {
         Write-Host "  ASIA (Asya)   ME (Orta Dogu) AF (Afrika)      OCEA (Okyanusya)"
         Write-Host "  Bolge ilk kurulumda secilir."
         Write-Host ""
-        Write-Host "Skor sistemi:" -ForegroundColor White
-        Write-Host "  Ping (%$($script:WeightAvgPing)) + Jitter (%$($script:WeightJitter)) + Kayip (%$($script:WeightPacketLoss)) = Oyun Skoru"
-        Write-Host "  Dusuk skor = daha iyi oyun deneyimi"
+        Write-Host "Skor sistemi (2 asamali):" -ForegroundColor White
+        Write-Host "  Faz 1 - Sinyal: RSRP(%40) + SNR(%40) + RSRQ(%20) x Bant genisligi"
+        Write-Host "    Genis bantlar (B3,B7,B42) bonus, dar bantlar (B20,B28) ceza alir"
+        Write-Host "  Faz 2 - Oyun:   Ping(%$($script:WeightAvgPing)) + Jitter(%$($script:WeightJitter)) + Kayip(%$($script:WeightPacketLoss))"
+        Write-Host "    Dusuk skor = daha iyi oyun deneyimi"
         Write-Host ""
         Write-Host "Ping degerlendirmesi:" -ForegroundColor White
         Write-Host "  0-30ms  MUKEMMEL  |  30-50ms  COK IYI"
@@ -1673,9 +1833,11 @@ function Show-Help {
         Write-Host "  ASIA (Asia)  ME (Mid East) AF (Africa)      OCEA (Oceania)"
         Write-Host "  Region is selected during first-run setup."
         Write-Host ""
-        Write-Host "Score system:" -ForegroundColor White
-        Write-Host "  Ping ($($script:WeightAvgPing)%) + Jitter ($($script:WeightJitter)%) + Packet Loss ($($script:WeightPacketLoss)%) = Game Score"
-        Write-Host "  Lower score = better gaming experience"
+        Write-Host "Score system (2-phase):" -ForegroundColor White
+        Write-Host "  Phase 1 - Signal: RSRP(40%) + SNR(40%) + RSRQ(20%) x Bandwidth"
+        Write-Host "    Wide bands (B3,B7,B42) get bonus, narrow (B20,B28) get penalty"
+        Write-Host "  Phase 2 - Gaming: Ping($($script:WeightAvgPing)%) + Jitter($($script:WeightJitter)%) + Loss($($script:WeightPacketLoss)%)"
+        Write-Host "    Lower score = better gaming experience"
         Write-Host ""
         Write-Host "Ping rating:" -ForegroundColor White
         Write-Host "  0-30ms  EXCELLENT  |  30-50ms  VERY GOOD"
